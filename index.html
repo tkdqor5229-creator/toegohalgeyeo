@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>퇴고할게여 — 신나는애프터센터 글쓰기동아리 신작클럽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E9E3D3;
+    --paper-deep:#DFD8C4;
+    --card:#FBF7EC;
+    --line:#C7784F;      /* 원고지 격자선 톤 */
+    --line-faint:#D8B79C;
+    --ink:#242220;
+    --ink-soft:#5B564C;
+    --seal:#AE3A2C;       /* 낙관 인주 색 */
+    --seal-dark:#8C2C21;
+    --jade:#3F6C5E;       /* 청자색 보조 */
+    --jade-soft:#E4EEE9;
+    --gold:#B08B3C;
+    --radius:2px;
+    --mission-ink:#284A40;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1E1D1A; --paper-deep:#2A2824; --card:#262420;
+      --line:#8A5A40; --line-faint:#4A4237;
+      --ink:#EDE7D8; --ink-soft:#B3AB9A;
+      --seal:#D0604F; --seal-dark:#A94536;
+      --jade:#7FB3A2; --jade-soft:#243530; --mission-ink:#BFDDD2;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1E1D1A; --paper-deep:#2A2824; --card:#262420;
+    --line:#8A5A40; --line-faint:#4A4237;
+    --ink:#EDE7D8; --ink-soft:#B3AB9A;
+    --seal:#D0604F; --seal-dark:#A94536;
+    --jade:#7FB3A2; --jade-soft:#243530; --mission-ink:#BFDDD2;
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  :root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+  html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+  body{
+    background:
+      repeating-linear-gradient(var(--paper) 0 27px, var(--line-faint) 27px 28px),
+      repeating-linear-gradient(90deg, var(--paper) 0 27px, var(--line-faint) 27px 28px),
+      var(--paper);
+    background-blend-mode:multiply, multiply, normal;
+    color:var(--ink);
+    font-family:'Noto Sans KR', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px 16px 80px;
+  }
+
+  .stage{
+    width:100%;
+    max-width:720px;
+  }
+
+  .frame{
+    background:var(--card);
+    border:1px solid var(--line);
+    box-shadow: 0 1px 0 var(--line), 0 20px 40px -28px rgba(36,34,32,0.45);
+    position:relative;
+    padding:40px 36px 36px;
+  }
+  .frame::before{
+    content:"";
+    position:absolute; inset:8px;
+    border:1px solid var(--line-faint);
+    pointer-events:none;
+  }
+
+  .kicker{
+    font-family:'Gaegu', cursive;
+    color:var(--jade);
+    font-size:15px;
+    letter-spacing:.02em;
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'Gaegu', cursive;
+    font-weight:700;
+    font-size:clamp(28px, 5vw, 40px);
+    line-height:1.35;
+    margin:0 0 14px;
+    color:var(--seal);
+  }
+  .lede{
+    font-size:15px;
+    line-height:1.8;
+    color:var(--ink-soft);
+    margin:0 0 28px;
+    max-width:52ch;
+  }
+
+  /* ---------- 시작 화면 ---------- */
+  .grid-preview{
+    display:grid;
+    grid-template-columns:repeat(10, 1fr);
+    gap:1px;
+    background:var(--line-faint);
+    border:1px solid var(--line-faint);
+    margin:0 0 30px;
+    max-width:360px;
+  }
+  .grid-preview span{
+    background:var(--card);
+    aspect-ratio:1;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Song Myung', serif;
+    font-size:14px;
+    color:var(--line-faint);
+  }
+  .grid-preview span.on{ color:var(--seal); }
+
+  button.primary{
+    appearance:none;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Noto Sans KR', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:14px 26px;
+    cursor:pointer;
+    letter-spacing:.02em;
+    transition:transform .15s ease, background .15s ease;
+  }
+  button.primary:hover{ background:var(--seal); border-color:var(--seal); }
+  button.primary:active{ transform:translateY(1px); }
+  button.primary:focus-visible, button.choice:focus-visible, button.ghost:focus-visible{
+    outline:3px solid var(--jade); outline-offset:2px;
+  }
+
+  .meta-line{
+    margin-top:22px;
+    font-size:13px;
+    color:var(--ink-soft);
+    display:flex; gap:18px; flex-wrap:wrap;
+  }
+  .meta-line b{ color:var(--ink); }
+
+  /* ---------- 진행 표시 (원고지 칸) ---------- */
+  .progress{
+    display:flex;
+    gap:4px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+  }
+  .progress i{
+    width:20px; height:20px;
+    border:1px solid var(--line);
+    display:block;
+    font-style:normal;
+  }
+  .progress i.filled{ background:var(--seal); border-color:var(--seal-dark); }
+  .progress i.current{ background:var(--jade-soft); border-color:var(--jade); }
+
+  .q-eyebrow{
+    font-size:12px;
+    letter-spacing:.14em;
+    color:var(--jade);
+    font-weight:700;
+    margin:0 0 10px;
+  }
+  .q-text{
+    font-family:'Gowun Batang', serif;
+    font-size:clamp(19px, 3vw, 23px);
+    line-height:1.6;
+    margin:0 0 24px;
+  }
+
+  .choices{ display:flex; flex-direction:column; gap:12px; }
+  button.choice{
+    text-align:left;
+    background:var(--paper);
+    border:1px solid var(--line-faint);
+    padding:16px 18px;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:15px;
+    line-height:1.6;
+    color:var(--ink);
+    cursor:pointer;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    transition:background .12s ease, border-color .12s ease, transform .08s ease;
+  }
+  button.choice .tag{
+    flex:0 0 auto;
+    font-family:'Song Myung', serif;
+    font-size:13px;
+    color:var(--seal);
+    border:1px solid var(--seal);
+    width:24px;height:24px;
+    display:flex;align-items:center;justify-content:center;
+    margin-top:1px;
+  }
+  button.choice:hover{ background:var(--card); border-color:var(--seal); }
+  button.choice:active{ transform:translateY(1px); }
+
+  .q-footer{
+    margin-top:22px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  button.ghost{
+    background:none;border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:4px;
+  }
+
+  /* ---------- 결과 화면 ---------- */
+  .result-top{
+    display:flex;
+    gap:26px;
+    align-items:center;
+    margin-bottom:26px;
+    flex-wrap:wrap;
+  }
+  .seal-wrap{
+    width:120px;height:120px;
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .seal{
+    width:112px;height:112px;
+    border:3px solid var(--seal);
+    border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--seal);
+    font-family:'Song Myung', serif;
+    font-size:30px;
+    letter-spacing:.03em;
+    transform:scale(0) rotate(-14deg);
+    opacity:0;
+    background:transparent;
+    animation:stamp .55s cubic-bezier(.2,1.4,.4,1) .15s forwards;
+  }
+  @keyframes stamp{
+    0%{ transform:scale(2.6) rotate(-14deg); opacity:0; }
+    55%{ opacity:1; }
+    75%{ transform:scale(0.92) rotate(-14deg); }
+    100%{ transform:scale(1) rotate(-14deg); opacity:1; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .seal{ animation:none; transform:scale(1) rotate(-14deg); opacity:1; }
+  }
+
+  .result-head .kicker{ margin-bottom:4px; }
+  .type-code{ font-size:13px; letter-spacing:.18em; color:var(--ink-soft); font-weight:700; }
+  h2.type-name{
+    font-family:'Song Myung', serif;
+    font-weight:400;
+    font-size:clamp(24px,4vw,30px);
+    margin:2px 0 10px;
+  }
+  .type-desc{
+    font-size:14.5px; line-height:1.8; color:var(--ink-soft); margin:0;
+    max-width:56ch;
+  }
+
+  .section-label{
+    font-size:12px; letter-spacing:.14em; color:var(--jade); font-weight:700;
+    margin:30px 0 12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-label::after{
+    content:""; flex:1; height:1px; background:var(--line-faint);
+  }
+
+  .book-card{
+    border:1px solid var(--line-faint);
+    background:var(--paper);
+    padding:16px 18px;
+    margin-bottom:12px;
+    position:relative;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:4px 16px;
+  }
+  .book-card::before{
+    content:"";
+    position:absolute; left:0; top:14px; bottom:14px; width:3px;
+    background:var(--jade);
+  }
+  .book-card .punch{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--paper-deep);
+    border:1px solid var(--line-faint);
+    grid-row:span 3;
+    align-self:start;
+    margin-top:4px;
+  }
+  .book-title{ font-family:'Gowun Batang', serif; font-size:16.5px; font-weight:700; }
+  .book-meta{ font-size:12px; color:var(--ink-soft); letter-spacing:.02em; }
+  .book-meta .badge{
+    display:inline-block; padding:1px 7px; border:1px solid var(--jade);
+    color:var(--jade); border-radius:999px; font-size:11px; margin-right:6px;
+  }
+  .book-blurb{ font-size:13.5px; line-height:1.65; color:var(--ink); margin-top:4px; }
+
+  .mission{
+    background:var(--jade-soft);
+    border:1px dashed var(--jade);
+    padding:16px 18px;
+    font-family:'Gaegu', cursive;
+    font-size:16px;
+    line-height:1.7;
+    color:var(--mission-ink);
+    margin-top:8px;
+  }
+  .mission b{ color:var(--seal); }
+
+  .result-actions{
+    margin-top:30px;
+    display:flex; gap:12px; flex-wrap:wrap;
+  }
+
+  footer.note{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:12px;
+    margin-top:18px;
+  }
+
+  [hidden]{ display:none !important; }
+
+  @media (max-width:520px){
+    .frame{ padding:28px 18px 26px; }
+    .progress i{ width:16px; height:16px; }
+    .book-card{ grid-template-columns:1fr; }
+    .book-card .punch{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- ============ 1. 시작 화면 ============ -->
+  <section class="frame" id="screen-intro">
+    <p class="kicker">신나는애프터센터 글쓰기동아리 신작클럽이 준비했어</p>
+    <h1>퇴고할게여</h1>
+    <p class="lede">
+      열두 개의 짧은 질문에 답하면, 16가지 성격유형 중 네 유형을 찾고
+      그 유형에 잘 어울리는 책 두 권이랑 오늘 가볍게 해볼 만한 작은 미션도 알려줄게.
+      정답은 없으니까, 평소 네 모습에 더 가까운 쪽으로 골라줘!
+    </p>
+
+    <div class="grid-preview" id="gridPreview" aria-hidden="true"></div>
+
+    <button class="primary" id="startBtn">원고지 첫 칸부터 시작하기 →</button>
+
+    <div class="meta-line">
+      <span><b>12</b>개의 질문</span>
+      <span>약 <b>3분</b> 소요</span>
+      <span><b>16</b>가지 유형 × 책 2권씩</span>
+    </div>
+  </section>
+
+  <!-- ============ 2. 질문 화면 ============ -->
+  <section class="frame" id="screen-quiz" hidden>
+    <div class="progress" id="progress"></div>
+    <p class="q-eyebrow" id="qEyebrow">QUESTION</p>
+    <p class="q-text" id="qText"></p>
+    <div class="choices" id="qChoices"></div>
+    <div class="q-footer">
+      <button class="ghost" id="backBtn">← 이전 질문</button>
+      <span style="font-size:12px;color:var(--ink-soft);" id="qCounter"></span>
+    </div>
+  </section>
+
+  <!-- ============ 3. 결과 화면 ============ -->
+  <section class="frame" id="screen-result" hidden>
+    <div class="result-top">
+      <div class="seal-wrap"><div class="seal" id="sealCode"></div></div>
+      <div class="result-head">
+        <p class="kicker">너의 책 유형은</p>
+        <p class="type-code" id="typeCode"></p>
+        <h2 class="type-name" id="typeName"></h2>
+      </div>
+    </div>
+    <p class="type-desc" id="typeDesc"></p>
+
+    <p class="section-label">이 유형한테 건네주고 싶은 책 두 권</p>
+    <div id="bookList"></div>
+
+    <p class="section-label">오늘의 미니 미션</p>
+    <div class="mission" id="mission"></div>
+
+    <div class="result-actions">
+      <button class="primary" id="restartBtn">처음부터 다시 하기</button>
+    </div>
+    <footer class="note">친구들이랑 결과 비교해보고, 신나는애프터센터 글쓰기동아리 신작클럽에도 놀러 와!</footer>
+  </section>
+
+</div>
+
+<script>
+(function(){
+
+  // ---------------- 데이터 ----------------
+  var QUESTIONS = [
+    // E / I
+    {axis:"EI", text:"쉬는 시간에 나는…",
+     a:{t:"친구들이랑 왁자지껄 떠들면서 에너지를 얻는다", v:"E"},
+     b:{t:"이어폰 끼고 혼자 조용히 시간을 보낸다", v:"I"}},
+    {axis:"EI", text:"낯선 사람이 많은 자리에 가면 나는…",
+     a:{t:"먼저 다가가서 말을 붙이는 편이다", v:"E"},
+     b:{t:"분위기를 살피며 천천히 적응하는 편이다", v:"I"}},
+    {axis:"EI", text:"스트레스를 풀고 싶을 때 나는…",
+     a:{t:"친구들을 불러 모아서 같이 논다", v:"E"},
+     b:{t:"혼자만의 시간을 갖는다", v:"I"}},
+
+    // S / N
+    {axis:"SN", text:"새로운 걸 배울 때 나는…",
+     a:{t:"순서대로 차근차근 익히는 게 편하다", v:"S"},
+     b:{t:"큰 흐름부터 파악하고 감으로 이해하는 게 편하다", v:"N"}},
+    {axis:"SN", text:"영화나 드라마를 볼 때 더 끌리는 건…",
+     a:{t:"실제로 있을 법한 현실적인 이야기", v:"S"},
+     b:{t:"상상력 가득한 판타지나 낯선 세계관", v:"N"}},
+    {axis:"SN", text:"계획을 세울 때 나는…",
+     a:{t:"지금 당장 할 수 있는 것부터 생각한다", v:"S"},
+     b:{t:"나중에 어떻게 될지 가능성부터 상상한다", v:"N"}},
+
+    // T / F
+    {axis:"TF", text:"친구가 고민을 털어놓으면 나는…",
+     a:{t:"어떻게 해결할지 같이 방법을 찾아준다", v:"T"},
+     b:{t:"일단 마음이 어땠을지 공감부터 해준다", v:"F"}},
+    {axis:"TF", text:"친구랑 다툼이 생겼을 때 나는…",
+     a:{t:"누가 맞고 틀렸는지 논리적으로 따져본다", v:"T"},
+     b:{t:"서로 감정이 상하지 않게 조율하려 한다", v:"F"}},
+    {axis:"TF", text:"중요한 결정을 내릴 때 나는…",
+     a:{t:"기준과 이유가 명확한 쪽을 고른다", v:"T"},
+     b:{t:"마음이 끌리는 쪽을 고른다", v:"F"}},
+
+    // J / P
+    {axis:"JP", text:"여행이나 나들이를 갈 때 나는…",
+     a:{t:"일정을 미리 짜두는 걸 좋아한다", v:"J"},
+     b:{t:"그때그때 발길 닿는 대로 다니는 걸 좋아한다", v:"P"}},
+    {axis:"JP", text:"시험 기간에 나는…",
+     a:{t:"계획표를 세우고 그대로 지키려 한다", v:"J"},
+     b:{t:"벼락치기로 몰아서 하는 편이다", v:"P"}},
+    {axis:"JP", text:"방을 정리할 때 나는…",
+     a:{t:"물건마다 자리를 정해서 규칙적으로 정리한다", v:"J"},
+     b:{t:"필요할 때만 정리하고 평소엔 편한 대로 둔다", v:"P"}}
+  ];
+
+  var TYPES = {
+    ISTJ:{ name:"한 문장도 허투루 쓰지 않는 기록자",
+      desc:"사실과 구조를 신뢰하고, 정해진 원칙 안에서 문장을 꾸준히 다듬어가는 유형이야.",
+      books:[
+        {title:"파운데이션", author:"아이작 아시모프", country:"해외", genre:"SF소설", blurb:"은하 제국의 몰락과 재건을 수학적 예측으로 그려낸 대작 SF 시리즈의 시작. 치밀한 설계와 논리를 좋아하는 사람에게 잘 맞아."},
+        {title:"동물농장", author:"조지 오웰", country:"해외", genre:"소설", blurb:"농장을 배경으로 권력이 작동하는 방식을 냉정하게 풀어낸 우화 소설이야."}
+      ],
+      mission:"오늘 있었던 일 중 가장 <b>사실적인 장면</b> 하나를 감정 없이, 사실만으로 다섯 문장으로 기록해봐!"},
+    ISFJ:{ name:"묵묵히 곁을 지키는 이야기꾼",
+      desc:"주변 사람과 일상의 온기를 세심하게 관찰하고 정성껏 기록하는 유형이야.",
+      books:[
+        {title:"앵무새 죽이기", author:"하퍼 리", country:"해외", genre:"장편소설", blurb:"한 소녀의 눈으로 바라본 편견과 정의에 관한 이야기를 담담하게 풀어낸 미국 문학의 고전이야."},
+        {title:"남아 있는 나날", author:"가즈오 이시구로", country:"해외", genre:"장편소설", blurb:"평생을 성실하게 일해 온 집사가 지나온 시간을 돌아보며 자신의 선택을 되짚는 소설이야."}
+      ],
+      mission:"동아리 친구 한 명을 떠올리며, 그 친구의 오늘 하루를 <b>다정한 시선</b>으로 짧게 묘사해봐!"},
+    INFJ:{ name:"세상의 결을 읽는 통찰가",
+      desc:"사람과 세상을 깊이 들여다보고, 그 안의 의미를 찾아 글로 옮기는 유형이야.",
+      books:[
+        {title:"데미안", author:"헤르만 헤세", country:"해외", genre:"장편소설", blurb:"자기 안의 목소리를 따라 성장해가는 여정을 그린, 내면 탐구형 독자에게 잘 맞는 고전이야."},
+        {title:"어린 왕자", author:"앙투안 드 생텍쥐페리", country:"해외", genre:"소설", blurb:"단순한 문장 속에 깊은 마음을 담아낸, 오래도록 사랑받는 애독서야."}
+      ],
+      mission:"요즘 마음에 걸리는 <b>질문 하나</b>를 정하고, 그 답을 찾아가는 짧은 글을 써봐!"},
+    INTJ:{ name:"이야기를 설계하는 전략가",
+      desc:"큰 그림을 먼저 그리고, 그 안의 논리와 구조를 치밀하게 채워가는 유형이야.",
+      books:[
+        {title:"삼체", author:"류츠신", country:"해외", genre:"SF소설", blurb:"외계 문명과의 접촉을 거대한 스케일로 그려낸 중국 SF 대작으로, 촘촘한 과학적 설정이 돋보여."},
+        {title:"체스 이야기", author:"슈테판 츠바이크", country:"해외", genre:"중편소설", blurb:"체스라는 하나의 틀 안에서 인간의 심리를 깊이 파고드는 중편소설이야."}
+      ],
+      mission:"내가 만들고 싶은 세계의 <b>규칙 세 가지</b>를 먼저 정하고, 그 위에서 짧은 장면 하나를 써봐!"},
+    ISTP:{ name:"묵묵히 실험하는 관찰자",
+      desc:"직접 부딪히고 분석하며 자기만의 방식으로 답을 찾아가는 유형이야.",
+      books:[
+        {title:"죽이고 싶은 아이", author:"이꽃님", country:"국내", genre:"청소년소설", blurb:"친구의 죽음을 둘러싼 진실을 여러 인물의 시선으로 교차해 보여주는 청소년 미스터리 소설이야."},
+        {title:"위저드 베이커리", author:"구병모", country:"국내", genre:"청소년소설", blurb:"이상한 빵집에 숨어든 소년이 겪는 기묘한 사건을 통해 가족의 의미를 되묻는 청소년 소설이야."}
+      ],
+      mission:"주인공이 곤란한 상황을 <b>논리적으로 해결</b>하는 장면을 순서대로 구체적으로 써봐!"},
+    ISFP:{ name:"조용히 감각을 벼리는 예술가",
+      desc:"눈에 보이는 아름다움과 순간의 감정을 섬세하게 붙잡는 유형이야.",
+      books:[
+        {title:"너도 하늘말나리야", author:"이금이", country:"국내", genre:"성장소설", blurb:"각자의 아픔을 가진 세 아이가 서로에게 곁을 내어주며 성장하는 이야기야."},
+        {title:"우리에게 남은 시간 46일", author:"이설", country:"국내", genre:"로맨스소설", blurb:"시한부 판정을 받은 인물과 그 곁을 지키는 사람의 애틋한 사랑을 그린 로맨스 소설이야."}
+      ],
+      mission:"오늘 눈에 담은 <b>색깔 하나</b>를 정하고, 그 색을 중심으로 짧은 산문을 써봐!"},
+    INFP:{ name:"마음속 세계를 그리는 몽상가",
+      desc:"자신만의 이상과 감정을 소중히 여기며, 진심을 담아 글을 쓰는 유형이야.",
+      books:[
+        {title:"소금아이", author:"이희영", country:"국내", genre:"청소년소설", blurb:"상처를 안고 살아가는 인물의 내면을 섬세하게 들여다보는 청소년 소설이야."},
+        {title:"세계를 건너 너에게 갈게", author:"이꽃님", country:"국내", genre:"청소년소설", blurb:"서로 다른 세계에 있는 두 사람이 마음을 나누어가는 과정을 그린 청소년 소설이야."}
+      ],
+      mission:"지금 내 마음속 감정 하나를 <b>색이나 날씨</b>에 빗대어 표현해봐!"},
+    INTP:{ name:"질문을 파고드는 사색가",
+      desc:"논리와 원리를 궁금해하며 끝까지 파고드는 것을 즐기는 유형이야.",
+      books:[
+        {title:"페인트", author:"이희영", country:"국내", genre:"청소년소설", blurb:"부모를 직접 면접 봐서 고르는 낯선 세계관을 통해 가족의 의미를 질문하는 청소년 소설이야."},
+        {title:"아몬드", author:"손원평", country:"국내", genre:"청소년소설", blurb:"감정을 잘 느끼지 못하는 소년이 사람들과 관계 맺는 법을 배워가는 청소년 소설이야."}
+      ],
+      mission:"평소 궁금했던 <b>'왜?'라는 질문</b> 하나를 정하고, 그 답을 상상해서 짧은 글로 풀어봐!"},
+    ESTP:{ name:"현장에서 이야기를 낚아채는 행동가",
+      desc:"몸으로 부딪히며 얻은 생생한 경험을 이야기로 풀어내는 유형이야.",
+      books:[
+        {title:"세계를 건너 너에게 갈게", author:"이꽃님", country:"국내", genre:"청소년소설", blurb:"서로 다른 세계에 있는 두 사람이 마음을 나누어가는 과정을 그린 청소년 소설이야."},
+        {title:"체리새우: 비밀글입니다", author:"황영미", country:"국내", genre:"청소년소설", blurb:"친구 관계 속 비밀과 진심을 촘촘하게 그린 청소년 소설이야."}
+      ],
+      mission:"오늘 가장 <b>긴박했던 순간</b>을 영화의 한 장면처럼 속도감 있게 써봐!"},
+    ESFP:{ name:"분위기를 살리는 이야기꾼",
+      desc:"사람들과 함께하는 순간의 즐거움과 온기를 이야기에 담는 유형이야.",
+      books:[
+        {title:"긴키 지방의 어느 장소에 대하여", author:"세스지", country:"해외", genre:"호러소설", blurb:"인터넷 괴담과 실종 사건을 다큐멘터리처럼 엮어낸 일본의 모큐멘터리 호러 소설이야."},
+        {title:"언젠가 우리가 같은 별을 바라본다면", author:"차인표", country:"국내", genre:"장편소설", blurb:"일제강점기를 배경으로 한 인물들의 사랑과 우정을 서정적으로 그린 장편소설이야."}
+      ],
+      mission:"동아리 사람들과 함께한 <b>즐거운 순간</b> 하나를 대화 중심으로 재구성해봐!"},
+    ENFP:{ name:"영감을 몰고 다니는 활동가",
+      desc:"새로운 아이디어와 사람에 대한 호기심으로 이야기를 확장해가는 유형이야.",
+      books:[
+        {title:"내 이름은 삐삐 롱스타킹", author:"아스트리드 린드그렌", country:"해외", genre:"아동문학", blurb:"자유분방하고 씩씩한 소녀 삐삐가 펼치는 유쾌한 모험을 담은 스웨덴 아동문학의 고전이야."},
+        {title:"히든 픽쳐스", author:"제이슨 르쿨락", country:"해외", genre:"스릴러소설", blurb:"그림을 그리는 아이를 돌보게 된 주인공이 마주하는 미스터리를 다룬 스릴러 소설이야."}
+      ],
+      mission:"최근 만난 <b>흥미로운 사람</b> 한 명을 떠올리고, 그 사람과의 대화를 상상해서 써봐!"},
+    ENTP:{ name:"질문으로 판을 뒤집는 도전자",
+      desc:"기존의 틀에 질문을 던지고 새로운 관점을 실험하는 유형이야.",
+      books:[
+        {title:"칵테일, 러브, 좀비", author:"조예은", country:"국내", genre:"소설집", blurb:"좀비 아포칼립스라는 낯선 설정을 발랄하게 비틀어낸 장르 소설집이야."},
+        {title:"유원", author:"백온유", country:"국내", genre:"청소년소설", blurb:"재난에서 홀로 살아남은 인물이 죄책감과 마주하며 다시 삶을 찾아가는 청소년 소설이야."}
+      ],
+      mission:"모두가 당연하게 여기는 것 하나를 골라, 그것을 <b>뒤집는 상상</b>을 짧은 글로 써봐!"},
+    ESTJ:{ name:"체계를 세우는 관리자",
+      desc:"목표를 정하고 계획대로 밀고 나가는 실행력이 강점인 유형이야.",
+      books:[
+        {title:"모순", author:"양귀자", country:"국내", genre:"장편소설", blurb:"닮은 듯 다른 두 자매의 삶을 통해 인생의 모순을 들여다보는 장편소설이야."},
+        {title:"종의 기원", author:"정유정", country:"국내", genre:"장편소설", blurb:"한 인물의 심리를 강한 추진력으로 끝까지 밀어붙이는 소설이야."}
+      ],
+      mission:"동아리에서 해보고 싶은 활동 하나를 정하고, <b>목표와 일정</b>을 담은 짧은 기획안을 써봐!"},
+    ESFJ:{ name:"사람을 잇는 이야기꾼",
+      desc:"주변 사람들과의 관계와 공동체의 이야기에 마음을 쏟는 유형이야.",
+      books:[
+        {title:"천년의 사랑", author:"양귀자", country:"국내", genre:"장편소설", blurb:"세 사람의 얽힌 인연을 통해 사랑의 여러 얼굴을 그린 장편소설이야."},
+        {title:"양면의 조개껍데기", author:"김초엽", country:"국내", genre:"SF소설집", blurb:"인간성과 정체성에 관한 질문을 던지는 SF 단편 일곱 편을 모은 소설집이야."}
+      ],
+      mission:"가족이나 친구 사이에 있었던 이야기를 <b>대화 형식</b>으로 짧게 재구성해봐!"},
+    ENFJ:{ name:"마음을 이끄는 조언자",
+      desc:"사람들의 성장과 관계를 살피며, 그 마음을 대변하는 글을 쓰는 유형이야.",
+      books:[
+        {title:"나의 미래에게", author:"주민선", country:"국내", genre:"청소년소설", blurb:"어른들이 사라진 세상에서 살아남기 위해 애쓰는 두 자매의 이야기를 그린 청소년 장편소설이야."},
+        {title:"내 심장을 쏴라", author:"정유정", country:"국내", genre:"장편소설", blurb:"정신병원을 배경으로 두 청년이 서로에게 힘이 되어주며 자유를 찾아가는 장편소설이야."}
+      ],
+      mission:"내가 힘이 되어주고 싶은 사람 한 명에게 보내는 <b>짧은 편지</b>를 써봐!"},
+    ENTJ:{ name:"이야기를 지휘하는 리더",
+      desc:"명확한 목표를 세우고 이야기 전체를 주도적으로 이끌어가는 유형이야.",
+      books:[
+        {title:"나는 소망한다 내게 금지된 것을", author:"양귀자", country:"국내", genre:"장편소설", blurb:"자신이 원하는 삶을 스스로 설계해 나가는 인물을 통해 자유와 욕망을 이야기하는 장편소설이야."},
+        {title:"괴테는 모든 것을 말했다", author:"스즈키 유이", country:"해외", genre:"장편소설", blurb:"출처를 알 수 없는 한 문장이 학자의 삶을 뒤흔드는 과정을 그린 일본 아쿠타가와상 수상작이야."}
+      ],
+      mission:"이야기 속 리더 캐릭터가 조직을 설득하는 <b>짧은 연설문</b>을 써봐!"}
+  };
+
+  // ---------------- 상태 ----------------
+  var current = 0;
+  var answers = new Array(QUESTIONS.length).fill(null);
+
+  var introScreen = document.getElementById('screen-intro');
+  var quizScreen = document.getElementById('screen-quiz');
+  var resultScreen = document.getElementById('screen-result');
+
+  // 시작 화면 미니 원고지 프리뷰
+  (function initPreview(){
+    var wrap = document.getElementById('gridPreview');
+    for(var i=0;i<30;i++){
+      var s = document.createElement('span');
+      if([2,7,13,18,24].indexOf(i)>-1){ s.textContent='文'; s.className='on'; }
+      wrap.appendChild(s);
+    }
+  })();
+
+  document.getElementById('startBtn').addEventListener('click', function(){
+    introScreen.hidden = true;
+    quizScreen.hidden = false;
+    renderQuestion();
+  });
+
+  document.getElementById('backBtn').addEventListener('click', function(){
+    if(current>0){ current--; renderQuestion(); }
+  });
+
+  document.getElementById('restartBtn').addEventListener('click', function(){
+    current = 0;
+    answers = new Array(QUESTIONS.length).fill(null);
+    resultScreen.hidden = true;
+    introScreen.hidden = false;
+  });
+
+  function renderProgress(){
+    var el = document.getElementById('progress');
+    el.innerHTML = '';
+    for(var i=0;i<QUESTIONS.length;i++){
+      var i_ = document.createElement('i');
+      if(answers[i]) i_.className='filled';
+      else if(i===current) i_.className='current';
+      el.appendChild(i_);
+    }
+  }
+
+  function renderQuestion(){
+    renderProgress();
+    var q = QUESTIONS[current];
+    document.getElementById('qEyebrow').textContent = 'QUESTION ' + (current+1) + ' / ' + QUESTIONS.length;
+    document.getElementById('qCounter').textContent = (current+1) + ' / ' + QUESTIONS.length;
+    document.getElementById('qText').textContent = q.text;
+    document.getElementById('backBtn').style.visibility = current===0 ? 'hidden' : 'visible';
+
+    var box = document.getElementById('qChoices');
+    box.innerHTML = '';
+    [q.a, q.b].forEach(function(opt, idx){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.innerHTML = '<span class="tag">' + (idx===0?'가':'나') + '</span><span>' + opt.t + '</span>';
+      b.addEventListener('click', function(){
+        answers[current] = opt.v;
+        if(current < QUESTIONS.length-1){
+          current++;
+          renderQuestion();
+        } else {
+          showResult();
+        }
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function computeType(){
+    var count = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+    answers.forEach(function(v){ if(v) count[v]++; });
+    var code =
+      (count.E>=count.I ? 'E':'I') +
+      (count.S>=count.N ? 'S':'N') +
+      (count.T>=count.F ? 'T':'F') +
+      (count.J>=count.P ? 'J':'P');
+    return code;
+  }
+
+  function showResult(){
+    quizScreen.hidden = true;
+    resultScreen.hidden = false;
+
+    var code = computeType();
+    var data = TYPES[code];
+
+    // 도장 애니메이션 재시작을 위해 요소 재생성
+    var sealWrap = document.querySelector('.seal-wrap');
+    sealWrap.innerHTML = '<div class="seal" id="sealCode">' + code + '</div>';
+
+    document.getElementById('typeCode').textContent = code;
+    document.getElementById('typeName').textContent = data.name;
+    document.getElementById('typeDesc').textContent = data.desc;
+
+    var list = document.getElementById('bookList');
+    list.innerHTML = '';
+    data.books.forEach(function(b){
+      var card = document.createElement('div');
+      card.className = 'book-card';
+      card.innerHTML =
+        '<span class="punch"></span>' +
+        '<div>' +
+          '<div class="book-title">' + b.title + '</div>' +
+          '<div class="book-meta"><span class="badge">' + b.country + '</span><span class="badge">' + b.genre + '</span>' + b.author + '</div>' +
+          '<div class="book-blurb">' + b.blurb + '</div>' +
+        '</div>';
+      list.appendChild(card);
+    });
+
+    document.getElementById('mission').innerHTML = data.mission;
+    resultScreen.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+})();
+</script>
+</body>
+</html>
